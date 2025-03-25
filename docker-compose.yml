@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  vespa:
+    image: vespaengine/vespa:latest
+    container_name: vespa
+    hostname: vespa-container
+    ports:
+      - "8080:8080"
+      - "19071:19071"
