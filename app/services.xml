@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Services that make up the Vespa application -->
+<services version="1.0">
+
+    <!-- Container cluster for document, query and result processing -->
+    <container id="text_search" version="1.0">
+        <!-- <search> set the query endpoint (default port 8080) -->
+        <search />
+        <document-processing />
+        <!-- <document-api> set the document endpoint for feeding -->
+        <document-api />
+    </container>
+
+    <!-- Define how documents are stored and searched -->
+    <content id="msmarco" version="1.0">
+        <!-- how many copies to keep of each document -->
+        <min-redundancy>1</min-redundancy>
+        <!-- assign the document types in the schema to content clusters -->
+        <documents>
+            <document type="msmarco" mode="index" />
+            <document-processing cluster="text_search" />
+        </documents>
+        <!-- define the hosts for the content cluster -->
+        <nodes>
+            <node distribution-key="0" hostalias="node1" />
+        </nodes>
+    </content>
+</services>

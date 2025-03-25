@@ -1,0 +1,66 @@
+schema msmarco {
+    # Document types define the fields that are used to index documents.
+    document msmarco {
+        field language type string {
+            indexing: "en" | set_language
+        }
+        field id type string {
+            indexing: attribute | summary
+            match: word
+        }
+        field title type string {
+            indexing: index | summary
+            match: text
+            index: enable-bm25
+        }
+        field body type string {
+            indexing: index
+            match: text
+            index: enable-bm25
+        }
+        field url type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+    }
+    # Fieldsets allow searching across multiple fields. Fields must share the same match and linguistic processing settings.
+    fieldset default {
+        fields: title, body, url
+    }
+    # Summary classes define what to show in search results.
+    document-summary minimal {
+        summary id {  }
+    }
+    document-summary url-tokens {
+        summary url {}
+        summary url-tokens {
+            source: url
+            tokens
+        }
+        from-disk
+    }
+    # Rank profiles define how to order documents (by computing scores for each one).
+    rank-profile default {
+        first-phase {
+            expression: nativeRank(title, body, url)
+        }
+    }
+    rank-profile bm25 inherits default {
+        first-phase {
+            expression: bm25(title) + bm25(body) + bm25(url)
+        }
+    }
+    rank-profile combined inherits default {
+        first-phase {
+            expression: bm25(title) + bm25(body) + bm25(url) + nativeRank(title) + nativeRank(body) + nativeRank(url)
+        }
+        match-features {
+          bm25(title)
+          bm25(body)
+          bm25(url)
+          nativeRank(title)
+          nativeRank(body)
+          nativeRank(url)
+        }
+    }
+}
